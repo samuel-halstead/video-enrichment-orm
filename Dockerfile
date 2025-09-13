@@ -1,15 +1,32 @@
-###############################################
-# Base Image
-###############################################
-
-ARG BASE_IMAGE=registry.gitlab.com/acceso/dive.tech/platform/base-images/python-poetry-image
-ARG BASE_TAG=0.8.0
+ARG BASE_IMAGE=python
+ARG BASE_TAG=3.11.13-slim
 
 FROM ${BASE_IMAGE}:${BASE_TAG}
 
-LABEL maintainer="Dive <it@dive.tech>"
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_VERSION=1.8.4 \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_CREATE=0 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
-ARG DIVE_PYPI_TOKEN
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y locales \
+    && sed -i -e '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+    && locale-gen \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install "poetry==$POETRY_VERSION"
+
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y curl build-essential \
@@ -17,8 +34,6 @@ RUN apt-get update \
 
 # copy project requirement files here to ensure they will be cached.
 COPY poetry.lock pyproject.toml ./
-
-RUN poetry config http-basic.dive-pypi DIVE_TECH_PYPI_TOKEN ${DIVE_PYPI_TOKEN}
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry config virtualenvs.create false \
