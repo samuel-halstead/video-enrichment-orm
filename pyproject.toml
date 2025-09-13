@@ -1,0 +1,88 @@
+[build-system]
+requires = ["poetry==1.8.4"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "video-enrichment-orm"
+version = "0.1.0"
+description = ""
+authors = ["Samuel Halstead <worksam1114@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.11.2"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+sqlalchemy = "2.0.30"
+alembic = "1.13.1"
+psycopg2-binary = "2.9.9"
+numpy = "^1.26.4"
+
+[tool.poetry.group.test.dependencies]
+coverage = "~7.2.1"
+pytest = "~7.2.1"
+pytest-asyncio = "^0.20.3"
+pytest-cov = "^4.0.0"
+pydantic = "2.5.3"
+pydantic-settings = "2.1.0"
+pre-commit = "^4.3.0"
+
+[tool.poetry.group.quality.dependencies]
+black = "~23.1.0"
+isort = "~5.12.0"
+mypy = "~1.0.1"
+ruff = "~0.0.253"
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-append --cov-report=term-missing"
+asyncio_mode = "auto"
+testpaths = [
+    "tests/unit",
+]
+
+[tool.black]
+line-length = 119
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+strict = true
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "N",  # pep8-naming
+    "S",  # flake8-bandit
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "C90",  # mccabe
+    "DTZ",  # flake8-datetimez
+    "PTH",  # flake8-use-pathlib
+    # "I",  # isort
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B024",  # abstract base class has no abstract methods
+    "S101",  # use 'assert' in tests
+]
+
+[tool.coverage.run]
+branch = true
+source = ["video_enrichment_orm"]
+
+[tool.coverage.report]
+ignore_errors = true
+show_missing = true
+fail_under = 0
+exclude_lines = [
+    "raise AssertionError",
+    "raise NotImplementedError"
+]
+omit = [
+    "*/*setup.py",
+    "*/tests/*",
+    "*/*__init__.py"
+]
